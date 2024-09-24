@@ -1,34 +1,39 @@
 import streamlit as st
-from langchain_core.messages import HumanMessage, AIMessage
-from dotenv import load_dotenv
-from your_movie_recommender import get_movie_recommendations
+import pandas as pd
+from src.data_processing import load_movie_data, filter_relevant_data
+from src.recommendation_engine import recommend_movies, create_user_movie_matrix, calculate_similarity
+from src.visualization import display_movie_data, display_movie_recommendations
 
-load_dotenv()
+file_path = 'data/tmdb_5000_movies.csv'
 
-def main():
-    st.title("Movie Recommender App")
-    
-    if 'history' not in st.session_state:
-        st.session_state['history'] = []
-    if 'input_key' not in st.session_state:
-        st.session_state['input_key'] = 0
+st.title('Sistema de Recomendación de Películas')
 
-    user_input = st.text_input("Enter your movie preferences:", key=f"user_input_{st.session_state['input_key']}")
+movies_df = load_movie_data(file_path)
+filtered_movies_df = filter_relevant_data(movies_df)
+display_movie_data(filtered_movies_df)
 
-    if st.button("Send"):
-        st.session_state['history'].append(HumanMessage(content=user_input))
-        
-        ai_response_content = get_movie_recommendations(user_input)
-        ai_response = AIMessage(content=ai_response_content)
-        st.session_state['history'].append(ai_response)
-        
-        st.session_state['input_key'] += 1
+movie_input = st.text_input('Introduce una película para obtener recomendaciones:')
 
-    for index, message in enumerate(st.session_state['history']):
-        if isinstance(message, HumanMessage):
-            st.text_area("You:", value=message.content, height=100, disabled=True, key=f"user_{index}")
-        elif isinstance(message, AIMessage):
-            st.text_area("AI:", value=message.content, height=100, disabled=True, key=f"ai_{index}")
+user_ratings_df = pd.DataFrame(columns=['userId', 'movieId', 'rating'])  
+if movie_input:
+    movie_matches = movies_df[movies_df['title'].str.contains(movie_input, case=False)]
 
-if __name__ == "__main__":
-    main()
+    if not movie_matches.empty:
+        selected_movie = st.selectbox('Selecciona una película:', movie_matches['title'])
+
+        movie_id = movie_matches[movie_matches['title'] == selected_movie]['id'].values[0]
+
+        # Corrección: usar pd.concat para añadir una nueva fila al DataFrame
+        user_ratings_df = pd.concat([user_ratings_df, pd.DataFrame([{
+            'userId': 1,  
+            'movieId': movie_id, 
+        }])])
+
+        user_movie_matrix = create_user_movie_matrix(movies_df, user_ratings_df)
+        similarity_matrix = calculate_similarity(user_movie_matrix)
+
+        recommended_movies = recommend_movies(movie_id, similarity_matrix, movies_df)
+
+        display_movie_recommendations(recommended_movies)
+    else:
+        st.warning('No se encontraron películas que coincidan con tu búsqueda.')

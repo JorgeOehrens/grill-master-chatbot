@@ -3,7 +3,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
 def load_data():
-    return pd.read_csv('data/movies/tmdb_5000_movies.csv')
+    return pd.read_csv('data/tmdb_5000_movies.csv')
 
 def create_similarity_matrix(data):
     tfidf = TfidfVectorizer(stop_words='english')
