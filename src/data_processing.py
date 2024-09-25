@@ -5,6 +5,6 @@ def load_movie_data(file_path):
     return movies_df
 
 def filter_relevant_data(movies_df):
-    relevant_columns = ['title', 'genres', 'vote_average', 'vote_count']
+    relevant_columns = ['title', 'genres', 'vote_average', 'vote_count', 'id']
     filtered_df = movies_df[relevant_columns]
     return filtered_df
