@@ -1,14 +1,12 @@
 import streamlit as st
 import pandas as pd
-from src.data_processing import load_movie_data, filter_relevant_data
-from src.recommendation_engine import recommend_movies, create_user_movie_matrix, calculate_similarity
-from src.visualization import display_movie_data, display_movie_recommendations
+from src.data_processing import load_movie_data
 import matplotlib.pyplot as plt  
 import time
+from src.recommendation_engine import create_embeddings, movies_df_dim, top_five_recommendations, get_movie_title, representation_df
+import faiss
 
-# Barra lateral para selección de página
-page = st.sidebar.selectbox('Seleccionar Página', ['Inicio', 'Sistema de Recomendación', 'Documentación'])
-movies_df = pd.read_csv('data/tmdb_5000_movies.csv')
+page = st.sidebar.selectbox('Seleccionar Página', ['Inicio', 'Sistema de Recomendación', 'Sistema de Recomendación2', 'Documentación'])
 
 # Definición de usuarios
 user = pd.DataFrame([
@@ -71,30 +69,56 @@ if page == 'Inicio':
     ''')
 
 elif page == 'Sistema de Recomendación':
-    file_path = 'data/tmdb_5000_movies.csv'
+    file_path = 'data/netflix_titles.csv'
     st.title('Sistema de Recomendación de Películas')
     movies_df = load_movie_data(file_path)
+
+    selected_stream = st.selectbox('Selecciona una plataforma de streaming:', stream_app['stream_name'])
+    st.image(stream_app[stream_app['stream_name'] == selected_stream]['stream_logo'].values[0], width=50)
+
+    movie_input = st.text_input('Introduce una película para obtener recomendaciones:')
+    director_favorite = st.text_input('Introduce tu director favorito:')
+    cast_favorite = st.text_input('Introduce tu actor/actriz favorito:')
+    genre_favorite = st.text_input('Introduce tu género favorito:')
+
+    if st.button('Buscar'):
+        favorite_movie = {
+            'title': movie_input,
+            'director': director_favorite,
+            'cast': cast_favorite,
+            'listed_in': genre_favorite,
+            'description': movie_input + " " + director_favorite + " " + cast_favorite + " " + genre_favorite  # Asegúrate de que este campo se maneje correctamente si es relevante
+        }
+        
+        representation = representation_df(favorite_movie)
+        embedding = create_embeddings(representation)
+
+        I = top_five_recommendations(embedding)
+        movies_df = movies_df_dim()
+        movies_df['textual_representation'] = movies_df.apply(representation_df, axis=1)
+
+        best_matches = get_movie_title(I, movies_df)
+    
+        for i, match in enumerate(best_matches, 1):
+            st.write(f"{i}. {match}")
+    
+    
+    
+
+elif page == 'Sistema de Recomendación2':
+    file_path = 'data/tmdb_5000_movies.csv'
+    st.title('Selecciona la siguiene pelicula que verá el personaje ')
+    movies_df = load_movie_data(file_path)
     filtered_movies_df = filter_relevant_data(movies_df)
-    display_movie_data(filtered_movies_df)
 
     selected_user = st.selectbox('Selecciona un usuario:', user['username'])
     st.image(user[user['username'] == selected_user]['profile_picture'].values[0], width=50)
     selected_stream = st.selectbox('Selecciona una plataforma de streaming:', stream_app['stream_name'])
     st.image(stream_app[stream_app['stream_name'] == selected_stream]['stream_logo'].values[0], width=50)
 
-    movie_input = st.text_input('Introduce una película para obtener recomendaciones:')
-    user_ratings_df = pd.DataFrame(columns=['userId', 'movieId', 'rating'])
-    
-    if movie_input:
-        movie_matches = filtered_movies_df[filtered_movies_df['title'].str.contains(movie_input, case=False)]
-        if not movie_matches.empty:
-            selected_movie = st.selectbox('Selecciona una película:', movie_matches['title'])
-            movie_id = movie_matches[movie_matches['title'] == selected_movie]['id'].values[0]
-            print(movie_id)
-            # Asegurarse de incluir la columna 'rating' con un valor predeterminado
 
-        else:
-            st.warning('No se encontraron películas que coincidan con tu búsqueda.')
+    
+    
 elif page == 'Documentación':
     st.title('Documentación del Sistema de Recomendación de Películas')
     st.write('''
