@@ -6,6 +6,6 @@ langchain_core
 pandas
 scikit-learn
 matplotlib
-faiss-cpu
 langchain-openai
 dotenv
+faiss-cpu
