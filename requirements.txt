@@ -5,3 +5,5 @@ python-dotenv
 langchain_core
 pandas
 scikit-learn
+matplotlib
+faiss-cpu
