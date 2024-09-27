@@ -1,0 +1,25 @@
+{
+    "stream_app": [
+        {
+            "stream_id": 1,
+            "stream_name": "Netflix",
+            "stream_url": "https://www.netflix.com",
+            "stream_logo": "https://www.netflix.com/favicon.ico",
+            "stream_description": "Netflix es una plataforma de streaming que ofrece una amplia variedad de películas y series."
+        },
+        {
+            "stream_id": 2,
+            "stream_name": "Amazon Prime Video",
+            "stream_url": "https://www.amazon.com/prime-video",
+            "stream_logo": "https://www.amazon.com/favicon.ico",
+            "stream_description": "Amazon Prime Video es una plataforma de streaming que ofrece una amplia variedad de películas y series."
+        },
+        {
+            "stream_id": 3,
+            "stream_name": "Hulu",
+            "stream_url": "https://www.hulu.com",
+            "stream_logo": "https://www.hulu.com/favicon.ico",
+            "stream_description": "Hulu es una plataforma de streaming que ofrece una amplia variedad de películas y series."
+        }
+    ]
+}

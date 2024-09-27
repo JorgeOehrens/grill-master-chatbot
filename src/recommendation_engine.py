@@ -24,13 +24,13 @@ def create_embeddings(favorite_movie):
 def top_five_recommendations(query_vector):
     index = faiss.read_index("src/embedding/index2.faiss")
     D, I = index.search(np.array([query_vector]), k=5)
-    print("Distancias:", D)  # Agregar para ver las distancias de los vecinos más cercanos
-    print("Índices:", I)    # Agregar para ver los índices de los vecinos más cercanos
+    print("Distancias:", D)  
+    print("Índices:", I)   
     return I
 
 def get_movie_title(I, movies_df):
     best_matches = np.array(movies_df['title'])[I.flatten()]
-    print("Mejores coincidencias:", best_matches)  # Agregar para verificar los títulos recuperados
+    print("Mejores coincidencias:", best_matches) 
     return best_matches
 
 def movies_df_dim():
