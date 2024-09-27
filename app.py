@@ -5,61 +5,20 @@ import matplotlib.pyplot as plt
 import time
 from src.recommendation_engine import create_embeddings, movies_df_dim, top_five_recommendations, get_movie_title, representation_df
 import faiss
+from src.visualization import display_movie_data
+import json
+
 
 page = st.sidebar.selectbox('Seleccionar Página', ['Inicio', 'Sistema de Recomendación', 'Sistema de Recomendación2', 'Documentación'])
+file_path = 'data/netflix_titles.csv'
+st.title('Sistema de Recomendación de Películas')
+movies_df = load_movie_data(file_path)
 
-# Definición de usuarios
-user = pd.DataFrame([
-    {
-        'userId': 1,
-        'username': 'John Doe',
-        'email': 'john.doe@example.com',
-        'password': 'password123',
-        'profile_picture': 'images/user_2.png',
-        'is_admin': False
-    },
-    {
-        'userId': 2,
-        'username': 'Jane Doe',
-        'email': 'jane.doe@example.com',
-        'password': 'password456',
-        'profile_picture': 'images/user.png',
-        'is_admin': False
-    },
-    {
-        'userId': 3,
-        'username': 'George',
-        'email': 'admin@example.com',
-        'password': 'admin123',
-        'profile_picture': 'images/user_3.png',
-        'is_admin': True
-    }
-])
+with open('src/data/users.json', 'r') as file:
+    user = json.load(file)
 
-# Definición de plataformas de streaming
-stream_app = pd.DataFrame([
-    {
-        'stream_id': 1,
-        'stream_name': 'Netflix',
-        'stream_url': 'https://www.netflix.com',
-        'stream_logo': 'https://www.netflix.com/favicon.ico',
-        'stream_description': 'Netflix es una plataforma de streaming que ofrece una amplia variedad de películas y series.'
-    },
-    {
-        'stream_id': 2,
-        'stream_name': 'Amazon Prime Video',
-        'stream_url': 'https://www.amazon.com/prime-video',
-        'stream_logo': 'https://www.amazon.com/favicon.ico',
-        'stream_description': 'Amazon Prime Video es una plataforma de streaming que ofrece una amplia variedad de películas y series.'
-    },
-    {
-        'stream_id': 3,
-        'stream_name': 'Hulu',
-        'stream_url': 'https://www.hulu.com',
-        'stream_logo': 'https://www.hulu.com/favicon.ico',
-        'stream_description': 'Hulu es una plataforma de streaming que ofrece una amplia variedad de películas y series.'
-    }
-])
+with open('src/data/stream_app.json', 'r') as file:
+    stream_app = json.load(file)
 
 if page == 'Inicio':
     st.title('Bienvenido al Sistema de Recomendación de Películas')
@@ -109,7 +68,6 @@ elif page == 'Sistema de Recomendación2':
     file_path = 'data/tmdb_5000_movies.csv'
     st.title('Selecciona la siguiene pelicula que verá el personaje ')
     movies_df = load_movie_data(file_path)
-    filtered_movies_df = filter_relevant_data(movies_df)
 
     selected_user = st.selectbox('Selecciona un usuario:', user['username'])
     st.image(user[user['username'] == selected_user]['profile_picture'].values[0], width=50)
@@ -136,11 +94,8 @@ elif page == 'Documentación':
     - **Visualización de Datos**: Se utilizan gráficos de pandas para mostrar los datos de películas y los perfiles de usuario.
     ''')
     st.subheader('Visualización de Películas')
-    fig, ax = plt.subplots()
-    movies_df['title'].value_counts().head(20).plot(kind='barh', ax=ax)
-    ax.set_xlabel('Número de Apariciones')
-    ax.set_ylabel('Películas')
-    st.pyplot(fig)
+    display_movie_data(movies_df)
+
     st.write('''
     ## 5. Interfaz de Usuario
     - **Interfaz de Usuario**: Se crea una interfaz de usuario simple para que los usuarios puedan seleccionar películas y recibir recomendaciones.

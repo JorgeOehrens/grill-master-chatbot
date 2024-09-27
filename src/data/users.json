@@ -1,0 +1,28 @@
+{
+    "users": [
+        {
+            "userId": 1,
+            "username": "John Doe",
+            "email": "john.doe@example.com",
+            "password": "password123",
+            "profile_picture": "images/user_2.png",
+            "is_admin": false
+        },
+        {
+            "userId": 2,
+            "username": "Jane Doe",
+            "email": "jane.doe@example.com",
+            "password": "password456",
+            "profile_picture": "images/user.png",
+            "is_admin": false
+        },
+        {
+            "userId": 3,
+            "username": "George",
+            "email": "admin@example.com",
+            "password": "admin123",
+            "profile_picture": "images/user_3.png",
+            "is_admin": true
+        }
+    ]
+}
